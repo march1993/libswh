@@ -34,5 +34,6 @@ all: lib example test
 .PHONY: clean
 clean:
 	-rm -rf obj
+	-rm -rf $(EXMAMPLE_FILES:%.c=%.out)
 	-rm -rf libswh.a
 
