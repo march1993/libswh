@@ -3,12 +3,12 @@
 
 int main(int argc, char * argv[]) {
 
-	matrix_int_t * mat = matrix_int_create(3, 2);
+	matrix_t * mat = matrix_create(3, 2);
 
 	for (size_t i = 0; i < 6; i++) {
 
-		* mi(mat, i % 3, i / 3) = i;
-		printf("writing to 0x%p\n", mi(mat, i % 3, i / 3));
+		MA(mat, i % 3, i / 3) = i;
+		printf("writing to 0x%p\n", &MA(mat, i % 3, i / 3));
 
 	}
 
@@ -16,12 +16,12 @@ int main(int argc, char * argv[]) {
 	for (size_t i = 0; i < 6; i++) {
 
 		// Not Recommended: here using `mat->data[i]` is for demonstration
-		printf("%d%s", mat->data[i], i == (6 - 1) ? "" : ", ");
+		printf("%lf%s", mat->data[i], i == (6 - 1) ? "" : ", ");
 
 	}
 	printf("]\n");
 
-	matrix_int_destroy(mat);
+	matrix_destroy(mat);
 
 	return 0;
 
