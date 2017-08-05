@@ -3,27 +3,23 @@
 
 #include <swh/math/matrix.h>
 
-matrix_t * matrix_create_0(size_t d0, size_t d1, size_t element_size) {
+#define matrix_define(TYPE, ABBR) \
+matrix_##TYPE##_t * matrix_##TYPE##_create(size_t d0, size_t d1) { \
+	matrix_##TYPE##_t * ret = malloc(sizeof(matrix_##TYPE##_t)); \
+	ret->d0 = d0; \
+	ret->d1 = d1; \
+	ret->element_size = sizeof(TYPE); \
+	ret->data = (TYPE *) calloc(d0 * d1, ret->element_size); \
+	return ret; \
+} \
+void matrix_##TYPE##_destroy(matrix_##TYPE##_t * matrix) { \
+	free(matrix->data); \
+	free(matrix); \
+} \
+TYPE * matrix_##TYPE##_at(matrix_##TYPE##_t * matrix, size_t i0, size_t i1) { \
+	return matrix->data + (i0 + matrix->d0 * i1); \
+} \
+TYPE * (* m##ABBR)(matrix_##TYPE##_t *, size_t, size_t) = matrix_##TYPE##_at;
 
-	matrix_t * ret = malloc(sizeof(matrix_t));
-	ret->d0 = d0;
-	ret->d1 = d1;
-	ret->element_size = element_size;
-	ret->data = (unsigned char *) calloc(d0 * d1, element_size);
 
-	return ret;
-
-}
-
-void matrix_destroy(matrix_t * matrix) {
-
-	free(matrix->data);
-	free(matrix);
-
-}
-
-unsigned char * matrix_at(matrix_t * matrix, size_t i0, size_t i1) {
-
-	return matrix->data + matrix->element_size * (i0 + matrix->d0 * i1);
-
-}
+matrix_types(matrix_define);
