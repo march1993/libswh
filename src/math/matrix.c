@@ -30,3 +30,12 @@ double * matrix_at(matrix_t * matrix, size_t i0, size_t i1) {
 
 }
 
+
+matrix_t * matrix_duplicate(matrix_t * matrix) {
+
+	matrix_t * ret = matrix_create(matrix->d0, matrix->d1);
+	memcpy(ret->data, matrix->data, matrix->d0 * matrix->d1 * matrix->element_size);
+
+	return ret;
+
+}
