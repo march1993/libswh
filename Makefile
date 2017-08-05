@@ -2,15 +2,19 @@
 
 PREFIX=/usr/local
 CC:=cc
-C_FLAGS:=-O3 -Iinclude
+CFLAGS:=-O3 -Iinclude
 LD_FLAGS:=
 
+.DEFAULT_GOAL:=all
+
 SRC_FILES := $(wildcard src/**/*.c)
+EXMAMPLE_FILES := $(wildcard example/**/*.c)
+TEST_FILES := $(wildcard test/**/*.c)
 OBJ_FILES := $(SRC_FILES:src/%.c=obj/%.o)
 
 $(OBJ_FILES): obj/%.o: src/%.c
 	mkdir -p $(dir $@)
-	$(CC) -c $(C_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 libswh.a: $(OBJ_FILES)
 	$(AR) rcs $@ $<
@@ -21,7 +25,7 @@ install: lib
 	cp libswh.a $(PREFIX)/lib
 	cp -r include/swh $(PREFIX)/include/
 
-example: lib
+example: lib $(EXMAMPLE_FILES:%.c=%.out)
 
 test: lib
 

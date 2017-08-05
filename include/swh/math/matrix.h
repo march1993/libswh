@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stddef.h>
 #include <stdlib.h>
 
 typedef struct matrix_tag matrix_t;
