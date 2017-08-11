@@ -17,18 +17,21 @@ struct matrix_tag {
 
 ## functions
 * matrix_create
+
 ```C
 matrix_t * matrix_create(size_t d0, size_t d1);
 ```
 Allocate the memory for a matrix_t structure. If static declaration is required, see `MATRIX_CREATE_STATIC`.
 
 * matrix_destroy
+
 ```C
 void matrix_destroy(matrix_t * matrix);
 ```
 Free the memory allocated for a matrix_t before.
 
 * MATRIX_CREATE_STATIC
+
 A macro used to declare a matrix structure statically, which is usually used in embedded platform due to the lack of `malloc` support. See `example/math/static.c`.
 
 * matrix_clear
