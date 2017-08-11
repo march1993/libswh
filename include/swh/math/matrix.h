@@ -12,8 +12,14 @@ struct matrix_tag {
 };
 
 extern matrix_t * matrix_create(size_t d0, size_t d1);
-extern void matrix_clear(matrix_t * matrix);
 extern void matrix_destroy(matrix_t * matrix);
+
+#define MATRIX_CREATE_STATIC(NAME, D0, D1) \
+static double NAME##_data[D0 * D1]; \
+static matrix_t NAME##_struct = { .d0 = D0, .d1 = D1, .element_size = sizeof(double), .data = NAME##_data }; \
+static matrix_t * NAME = & NAME##_struct;
+
+extern void matrix_clear(matrix_t * matrix);
 extern double * matrix_at(const matrix_t * matrix, size_t i0, size_t i1);
 
 #define MA(matrix, i0, i1) (* matrix_at(matrix, i0, i1))

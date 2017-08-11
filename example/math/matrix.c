@@ -14,14 +14,7 @@ void example_read_write_matrix() {
 
 	}
 
-	printf("mat->data: [");
-	for (size_t i = 0; i < 6; i++) {
-
-		// Not Recommended: here using `mat->data[i]` is for demonstration
-		printf("%lf%s", mat->data[i], i == (6 - 1) ? "" : ", ");
-
-	}
-	printf("]\n");
+	fprintf_matrix(stdout, mat, "example_read_write_matrix: out");
 
 	matrix_destroy(mat);
 
@@ -32,12 +25,12 @@ void example_matrix_multiply() {
 	matrix_t * left = matrix_create_from_csv("left.csv");
 	matrix_t * right = matrix_create_from_csv("right.csv");
 
-	fprintf_matrix(stdout, left, "left");
-	fprintf_matrix(stdout, right, "right");
+	fprintf_matrix(stdout, left, "example_matrix_multiply: left");
+	fprintf_matrix(stdout, right, "example_matrix_multiply: right");
 
 	matrix_t * out = matrix_create(left->d1, right->d0);
 	matrix_multiply(left, right, out);
-	fprintf_matrix(stdout, out, "out");
+	fprintf_matrix(stdout, out, "example_matrix_multiply: out");
 
 	matrix_destroy(out);
 	matrix_destroy(left);
