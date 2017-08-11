@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include <swh/math/matrix.h>
 
@@ -17,6 +18,12 @@ matrix_t * matrix_create(size_t d0, size_t d1) {
 
 }
 
+void matrix_clear(matrix_t * matrix) {
+
+	memset(matrix->data, 0, matrix->d0 * matrix->d1 * matrix->element_size);
+
+}
+
 void matrix_destroy(matrix_t * matrix) {
 
 	free(matrix->data);
@@ -24,18 +31,64 @@ void matrix_destroy(matrix_t * matrix) {
 
 }
 
-double * matrix_at(matrix_t * matrix, size_t i0, size_t i1) {
+double * matrix_at(const matrix_t * matrix, size_t i0, size_t i1) {
+
+	assert(i0 < matrix->d0);
+	assert(i1 < matrix->d1);
 
 	return matrix->data + (i0 + matrix->d0 * i1);
 
 }
 
 
-matrix_t * matrix_duplicate(matrix_t * matrix) {
+void matrix_duplicate(const matrix_t * src, matrix_t * dest) {
 
-	matrix_t * ret = matrix_create(matrix->d0, matrix->d1);
-	memcpy(ret->data, matrix->data, matrix->d0 * matrix->d1 * matrix->element_size);
+	assert(src->d0 == dest->d0);
+	assert(src->d1 == dest->d1);
 
-	return ret;
+	memcpy(dest->data, src->data, src->d0 * src->d1 * src->element_size);
+
+}
+
+
+void matrix_inverse(const matrix_t * in, matrix_t * out) {
+
+	// TODO:
+
+}
+
+void matrix_multiply(const matrix_t * left, const matrix_t * right, matrix_t * out) {
+
+	assert(left->d0 == right->d1);
+	assert(out->d1 == left->d1);
+	assert(out->d0 == right->d0);
+
+	matrix_clear(out);
+
+	for (size_t i1 = 0; i1 < left->d1; i1++)
+	for (size_t i0 = 0; i0 < left->d0; i0++) {
+
+		for (size_t j0 = 0; j0 < right->d0; j0++) {
+
+			double prod = MA(left, i0, i1) * MA(right, j0, i0);
+			MA(out, i1, j0) += prod;
+
+		}
+
+	}
+
+}
+
+void matrix_multiply_k(const matrix_t * in, const double k, matrix_t * out) {
+
+	assert(in->d0 == out->d0);
+	assert(in->d1 == out->d1);
+
+	for (size_t i1 = 0; i1 < in->d1; i1++)
+	for (size_t i0 = 0; i0 < in->d0; i0++) {
+
+		MA(out, i0, i1) = k * MA(in, i0, i1);
+
+	}
 
 }

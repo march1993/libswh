@@ -2,7 +2,11 @@
 
 PREFIX := /usr/local
 CC := cc
-CFLAGS := -O3 -Iinclude -std=c11
+
+CFLAGS := -O3 -Iinclude -std=c11 -DNDEBUG
+# DEBUG
+# CFLAGS := -Iinclude -std=c11
+
 LD_FLAGS :=
 
 .DEFAULT_GOAL:=all
