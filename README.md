@@ -8,7 +8,7 @@ This means these functions should run on a modern amd64 machine, but also on emb
 
 * Easy to modify
 
-The structure of the codes should be clear and easy to understand. For example, the allocation of `math/matrix.h` depends on `malloc` function families, but it is easy to modify it into static declared variables with investigating `matrix_create` and `matrix_destroy` functions only.
+The structure of the codes should be clear and easy to understand. For example, the allocation of `matrix_t` depends on `malloc` function families, but it is easy to modify it into static declared variables by investigating `matrix_create` and `matrix_destroy` functions only, or by using provided macro `MATRIX_CREATE_STATIC`.
 
 * Easy to accelerate
 

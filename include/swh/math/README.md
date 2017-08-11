@@ -17,14 +17,12 @@ struct matrix_tag {
 
 ## functions
 * matrix_create
-
 ```C
 matrix_t * matrix_create(size_t d0, size_t d1);
 ```
 Allocate the memory for a matrix_t structure. If static declaration is required, see `MATRIX_CREATE_STATIC`.
 
 * matrix_destroy
-
 ```C
 void matrix_destroy(matrix_t * matrix);
 ```
@@ -35,8 +33,23 @@ Free the memory allocated for a matrix_t before.
 A macro used to declare a matrix structure statically, which is usually used in embedded platform due to the lack of `malloc` support. See `example/math/static.c`.
 
 * matrix_clear
+```C
+void matrix_clear(matrix_t * matrix);
+```
+Set all the elements of a matrix into 0;
+
 * matrix_at
+```C
+double * matrix_at(const matrix_t * matrix, size_t i0, size_t i1);
+```
+`matrix_at` return the pointer to the element of certain position.
+
 * MA
+```C
+#define MA(matrix, i0, i1) (* matrix_at(matrix, i0, i1))
+```
+`MA` defines a convenient macro to visit the element inside a matrix.
+
 * matrix_duplicate
 * matrix_inverse
 * matrix_multiply
