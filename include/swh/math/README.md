@@ -1,4 +1,8 @@
-# swh/math
+# matrix.h
+`matrix.h` is a very basic definition of matrix structures and functions.
+
+## depends
+No depends.
 
 ## structure
 Structure description for matrix.

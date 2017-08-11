@@ -92,3 +92,5 @@ void matrix_multiply_k(const matrix_t * in, const double k, matrix_t * out) {
 	}
 
 }
+
+

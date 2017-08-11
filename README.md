@@ -17,3 +17,8 @@ In some application scenes where the performance of program is critical, this li
 * Easy to decouple
 
 It is okay to compile entire library, but it should be also possible to use only several header and source files of this library.
+
+* No warning generated
+
+No warning from the compiler would be tolerated.
+
