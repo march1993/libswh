@@ -63,17 +63,17 @@ void matrix_multiply(const matrix_t * left, const matrix_t * right, matrix_t * o
 	assert(out->d1 == left->d1);
 	assert(out->d0 == right->d0);
 
-	matrix_clear(out);
-
 	for (size_t i1 = 0; i1 < left->d1; i1++)
-	for (size_t i0 = 0; i0 < left->d0; i0++) {
+	for (size_t i0 = 0; i0 < right->d0; i0++) {
 
-		for (size_t j0 = 0; j0 < right->d0; j0++) {
+		double sum = 0;
+		for (size_t j0 = 0; j0 < left->d0; j0++) {
 
-			double prod = MA(left, i0, i1) * MA(right, j0, i0);
-			MA(out, i1, j0) += prod;
+			sum += MA(left, j0, i1) * MA(right, i0, j0);
 
 		}
+
+		MA(out, i0, i1) = sum;
 
 	}
 
