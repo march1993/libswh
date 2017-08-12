@@ -86,7 +86,7 @@ void matrix_exchange_rows(matrix_t * matrix, size_t r0, size_t r1) {
 /**
  *	Use the idea of (A|I) ~ (I|B) (with elementary row operations), then B = inv(A)
  */
-bool matrix_inverse(const matrix_t * in, matrix_t * tmp, matrix_t * out) {
+int matrix_inverse(const matrix_t * in, matrix_t * tmp, matrix_t * out) {
 
 	size_t N = in->d0;
 
@@ -182,7 +182,7 @@ bool matrix_inverse(const matrix_t * in, matrix_t * tmp, matrix_t * out) {
 	}
 
 
-	return has_inverse;
+	return has_inverse ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 void matrix_multiply(const matrix_t * left, const matrix_t * right, matrix_t * out) {

@@ -64,10 +64,10 @@ void example_matrix_inverse(const char * filename) {
 
 	fprintf_matrix(stdout, in, "example_matrix_inverse: in");
 
-	bool has_inverse = matrix_inverse(in, tmp, out);
-	printf("has_inverse: %s\n", has_inverse ? "true" : "false");
+	bool status = matrix_inverse(in, tmp, out);
+	printf("status: %s\n", status == 0 ? "EXIT_SUCCESS" : "EXIT_FAILURE, i.e., has no inverse");
 
-	if (has_inverse) {
+	if (status == EXIT_SUCCESS) {
 
 		fprintf_matrix(stdout, tmp, "example_matrix_inverse: tmp");
 		fprintf_matrix(stdout, out, "example_matrix_inverse: out");

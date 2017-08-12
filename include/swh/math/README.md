@@ -57,6 +57,28 @@ struct matrix_tag {
    `MA` defines a convenient macro to visit the element inside a matrix.
 
 * matrix_duplicate
+   ```C
+   void matrix_duplicate(const matrix_t * src, matrix_t * dest);
+   ```
+   Copy the entire matrix from `src` to `dest`. Dimensions of two matrices should be same.
+
 * matrix_inverse
+   ```C
+   int matrix_inverse(const matrix_t * in, matrix_t * tmp, matrix_t * out);
+   ```
+   Calculate the inverse of the matrix `in`, a same-sized temporary matrix `tmp` should be prepared.
+
+   `EXIT_SUCCESS` would be returned if the inverse exists, otherwise, `EXIT_FAILURE`.
+
 * matrix_multiply
+   ```C
+   void matrix_multiply(const matrix_t * left, const matrix_t * right, matrix_t * out);
+   ```
+   Multiply two matrices, i.e., out = left * right.
+
 * matrix_multiply_k
+   ```C
+   void matrix_multiply_k(const matrix_t * in, const double k, matrix_t * out);
+   ```
+   Multiply the matrix `in` by constant `k`.
+
