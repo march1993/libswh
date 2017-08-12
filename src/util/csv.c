@@ -1,7 +1,7 @@
 #include <swh/util/csv.h>
 #include <stdio.h>
 
-matrix_t * matrix_create_from_csv(char * filename) {
+matrix_t * matrix_create_from_csv(const char * filename) {
 
 	FILE * file = fopen(filename, "rb");
 
@@ -77,7 +77,7 @@ matrix_t * matrix_create_from_csv(char * filename) {
 }
 
 
-void matrix_write_to_csv(char * filename, matrix_t * matrix) {
+void matrix_write_to_csv(const char * filename, matrix_t * matrix) {
 
 	FILE * file = fopen(filename, "w");
 

@@ -16,7 +16,7 @@ This is a library maintained by myself which includes the general functions I've
 
 * Easy to decouple
 
-   It is okay to compile entire library, but it should be also possible to use only several header and source files of this library.
+   It is okay to compile entire library, but it should be also possible to use only several header and source files from this library.
 
 * No warning generated
 

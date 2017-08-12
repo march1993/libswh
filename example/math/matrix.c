@@ -56,10 +56,36 @@ void example_matrix_multiply() {
 
 }
 
+void example_matrix_inverse(const char * filename) {
+
+	matrix_t * in = matrix_create_from_csv(filename);
+	matrix_t * tmp = matrix_create(in->d0, in->d1);
+	matrix_t * out = matrix_create(in->d0, in->d1);
+
+	fprintf_matrix(stdout, in, "example_matrix_inverse: in");
+
+	bool has_inverse = matrix_inverse(in, tmp, out);
+	printf("has_inverse: %s\n", has_inverse ? "true" : "false");
+
+	if (has_inverse) {
+
+		fprintf_matrix(stdout, tmp, "example_matrix_inverse: tmp");
+		fprintf_matrix(stdout, out, "example_matrix_inverse: out");
+
+	}
+
+	matrix_destroy(out);
+	matrix_destroy(tmp);
+	matrix_destroy(in);
+
+}
+
 int main(int argc, char * argv[]) {
 
 	example_read_write_matrix();
 	example_matrix_multiply();
+	example_matrix_inverse("inv1.csv");
+	example_matrix_inverse("inv2.csv");
 
 	return 0;
 

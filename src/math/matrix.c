@@ -19,6 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
+#include <float.h>
+#include <string.h>
 
 #include <swh/math/matrix.h>
 
@@ -68,11 +71,118 @@ void matrix_duplicate(const matrix_t * src, matrix_t * dest) {
 
 }
 
+void matrix_exchange_rows(matrix_t * matrix, size_t r0, size_t r1) {
 
-void matrix_inverse(const matrix_t * in, matrix_t * out) {
+	double tmp[matrix->d0];
 
-	// TODO:
+	size_t N = matrix->d0 * matrix->element_size;
 
+	memcpy(tmp, &MA(matrix, 0, r0), N);
+	memcpy(&MA(matrix, 0, r0), &MA(matrix, 0, r1), N);
+	memcpy(&MA(matrix, 0, r1), tmp, N);
+
+}
+
+/**
+ *	Use the idea of (A|I) ~ (I|B) (with elementary row operations), then B = inv(A)
+ */
+bool matrix_inverse(const matrix_t * in, matrix_t * tmp, matrix_t * out) {
+
+	size_t N = in->d0;
+
+	assert(N == in->d1);
+	assert(N == out->d0);
+	assert(N == out->d1);
+	assert(N == tmp->d0);
+	assert(N == tmp->d1);
+
+	matrix_duplicate(in, tmp);
+	matrix_clear(out);
+
+	for (size_t i0 = 0; i0 < N; i0++) {
+
+		MA(out, i0, i0) = 1.0f;
+
+	}
+
+	bool has_inverse = true;
+	for (size_t i = 0; i < N && has_inverse; i++) {
+
+		has_inverse = false;
+
+		// find the first non-zero element in i-th col starting from i-th row
+		for (size_t j = i; j < N; j++) {
+
+			if (fabs(MA(tmp, i, j)) >= DBL_EPSILON) {
+
+				// found
+				has_inverse = true;
+
+
+				if (i != j) {
+
+					// exchange two rows
+					matrix_exchange_rows(tmp, i, j);
+					matrix_exchange_rows(out, i, j);
+
+				}
+
+				// use i-th row to cancels the elements in the following rows
+				for (j = i + 1; j < N; j++) {
+
+					double r = MA(tmp, i, j) / MA(tmp, i, i);
+
+					for (size_t k = 0; k < N; k++) {
+						MA(tmp, k, j) -= r * MA(tmp, k, i);
+						MA(out, k, j) -= r * MA(out, k, i);
+					}
+
+				}
+
+				j = N;
+
+			}
+
+		}
+	}
+
+	// matrix tmp now becomes an upper triangular
+
+	if (has_inverse) {
+
+		for (size_t i = 0; i < N; i++) {
+
+			size_t j = N - 1 - i;
+
+			// normalize
+			double e = MA(tmp, j, j);
+			MA(tmp, j, j) = 1.0f;
+
+			for (size_t l = 0; l < N; l++) {
+
+				MA(out, l, j) /= e;
+
+			}
+
+			// use j-th row to cancels the elements in k-th row
+			for (size_t k = 0; k < j; k++) {
+
+				double r = MA(tmp, j, k) / MA(tmp, j, j);
+				for (size_t l = 0; l < N; l++) {
+
+					MA(tmp, l, k) -= r * MA(tmp, l, j);
+					MA(out, l, k) -= r * MA(out, l, j);
+
+				}
+
+			}
+
+		}
+
+	}
+
+
+	return has_inverse;
 }
 
 void matrix_multiply(const matrix_t * left, const matrix_t * right, matrix_t * out) {

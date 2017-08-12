@@ -1,4 +1,4 @@
-# matrix.h
+# 1. matrix.h
 `matrix.h` is a very basic definition of matrix structures and functions.
 
 ## depends

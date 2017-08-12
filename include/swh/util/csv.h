@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <swh/math/matrix.h>
 
-extern matrix_t * matrix_create_from_csv(char * filename);
+extern matrix_t * matrix_create_from_csv(const char * filename);
 
-extern void matrix_write_to_csv(char * filename, matrix_t * matrix);
+extern void matrix_write_to_csv(const char * filename, matrix_t * matrix);
 

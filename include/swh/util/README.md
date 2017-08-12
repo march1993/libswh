@@ -1,4 +1,4 @@
-# csv.h
+# 1. csv.h
 `csv.h` provides functions to read or write csv files. CSV file size should be *less than 2GiB*.
 
 ## depends
@@ -15,7 +15,7 @@
    void matrix_write_to_csv(char * filename, matrix_t * matrix);
    ```
 
-# matrix.h
+# 2. matrix.h
 `matrix.h` provides `fprintf_matrix` to print a matrix in a decent way.
 
 ## depends
