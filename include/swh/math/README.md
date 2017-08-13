@@ -32,6 +32,12 @@ struct matrix_tag {
    ```
    Free the memory allocated for a matrix_t before.
 
+* matrix_resize
+   ```C
+   void matrix_resize(matrix_t * matrix, size_t d0, size_t d1);
+   ```
+   Resize the matrix. Overlapped elements would be kept unchanged, otherwise, zeros would be filled.
+
 * MATRIX_CREATE_STATIC
    ```C
    #define MATRIX_CREATE_STATIC(NAME, D0, D1)
@@ -60,25 +66,46 @@ struct matrix_tag {
    ```C
    void matrix_duplicate(const matrix_t * src, matrix_t * dest);
    ```
-   Copy the entire matrix from `src` to `dest`. Dimensions of two matrices should be same.
+   Copy the entire matrix from `src` to `dest`. Sizes of two matrices should be same.
 
 * matrix_inverse
    ```C
-   int matrix_inverse(const matrix_t * in, matrix_t * tmp, matrix_t * out);
+   int matrix_inverse(const matrix_t * in, matrix_t * out);
    ```
-   Calculate the inverse of the matrix `in`, a same-sized temporary matrix `tmp` should be prepared.
+   Calculate the inverse of the matrix `in`. Two matrices should be same sized and square.
 
    `EXIT_SUCCESS` would be returned if the inverse exists, otherwise, `EXIT_FAILURE`.
+
+   This naïve implementation is inspired of the idea using elementary row operations to let (A|I) become (I|B), then B = inv(A).
+
+   Its algorithm complexity is round O(N^3), while there are much faster approaches using BLAS libraries, in case extreme performance is needed.
 
 * matrix_multiply
    ```C
    void matrix_multiply(const matrix_t * left, const matrix_t * right, matrix_t * out);
    ```
-   Multiply two matrices, i.e., out = left * right.
+   Multiply two matrices, i.e., out = left * right. Its algorithm complexity is O(N^3). `d0` of `left` should be same to `d1` of `right`, `d0` of `out` same to `d1` of `right` and `d1` of `out` same to `d1` of `left`.
 
 * matrix_multiply_k
    ```C
    void matrix_multiply_k(const matrix_t * in, const double k, matrix_t * out);
    ```
-   Multiply the matrix `in` by constant `k`.
+   Multiply the matrix `in` by constant `k`. Sizes of two matrices should be same.
 
+* matrix_transpose
+   ```C
+   void matrix_transpose(const matrix_t * in, matrix_t * out);
+   ```
+   Transpose matrix `in` into `out`. `d0` of `in` should be `d1` of `out`, vice versa.
+
+* matrix_svd
+   ```C
+   void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V);
+   ```
+   Singular value decomposition, i.e., in = U * S * V'. `in` and `U` should be same sized. `S` and `V` should be same sized and square. `d0` of `S` should be same to `d0` of `in`.
+
+* matrix_pinv
+   ```C
+   void matrix_pinv(const matrix_t * in, matrix_t * out, double tol);
+   ```
+   Calculate the MoorePenrose pseudoinverse of matrix `in`. `d0` of `in` should be `d1` of `out`, vice versa.

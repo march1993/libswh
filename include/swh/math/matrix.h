@@ -32,6 +32,7 @@ struct matrix_tag {
 
 extern matrix_t * matrix_create(size_t d0, size_t d1);
 extern void matrix_destroy(matrix_t * matrix);
+extern void matrix_resize(matrix_t * matrix, size_t d0, size_t d1);
 
 #define MATRIX_CREATE_STATIC(NAME, D0, D1) \
 static double NAME##_data[D0 * D1]; \
@@ -44,6 +45,9 @@ extern double * matrix_at(const matrix_t * matrix, size_t i0, size_t i1);
 #define MA(matrix, i0, i1) (* matrix_at(matrix, i0, i1))
 
 extern void matrix_duplicate(const matrix_t * src, matrix_t * dest);
-extern int matrix_inverse(const matrix_t * in, matrix_t * tmp, matrix_t * out);
+extern int matrix_inverse(const matrix_t * in, matrix_t * out);
 extern void matrix_multiply(const matrix_t * left, const matrix_t * right, matrix_t * out);
 extern void matrix_multiply_k(const matrix_t * in, const double k, matrix_t * out);
+extern void matrix_transpose(const matrix_t * in, matrix_t * out);
+extern void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V);
+extern void matrix_pinv(const matrix_t * in, matrix_t * out);

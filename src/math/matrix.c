@@ -52,6 +52,25 @@ void matrix_destroy(matrix_t * matrix) {
 
 }
 
+void matrix_resize(matrix_t * matrix, size_t d0, size_t d1) {
+
+	double * buffer = (double *) calloc(d0 * d1, matrix->element_size);
+	matrix_t dummy = { .d0 = d0, .d1 = d1, .data = buffer };
+
+	for (size_t i1 = 0; i1 < d1 && i1 < matrix->d1; i1++)
+	for (size_t i0 = 0; i0 < d0 && i0 < matrix->d0; i0++) {
+
+		MA(&dummy, i0, i1) = MA(matrix, i0, i1);
+
+	}
+
+	free(matrix->data);
+	matrix->data = buffer;
+	matrix->d0 = d0;
+	matrix->d1 = d1;
+
+}
+
 double * matrix_at(const matrix_t * matrix, size_t i0, size_t i1) {
 
 	assert(i0 < matrix->d0);
@@ -86,16 +105,15 @@ void matrix_exchange_rows(matrix_t * matrix, size_t r0, size_t r1) {
 /**
  *	Use the idea of (A|I) ~ (I|B) (with elementary row operations), then B = inv(A)
  */
-int matrix_inverse(const matrix_t * in, matrix_t * tmp, matrix_t * out) {
+int matrix_inverse(const matrix_t * in, matrix_t * out) {
 
 	size_t N = in->d0;
 
 	assert(N == in->d1);
 	assert(N == out->d0);
 	assert(N == out->d1);
-	assert(N == tmp->d0);
-	assert(N == tmp->d1);
 
+	matrix_t * tmp = matrix_create(N, N);
 	matrix_duplicate(in, tmp);
 	matrix_clear(out);
 
@@ -181,6 +199,8 @@ int matrix_inverse(const matrix_t * in, matrix_t * tmp, matrix_t * out) {
 
 	}
 
+	matrix_destroy(tmp);
+
 
 	return has_inverse ? EXIT_SUCCESS : EXIT_FAILURE;
 }
@@ -222,3 +242,82 @@ void matrix_multiply_k(const matrix_t * in, const double k, matrix_t * out) {
 }
 
 
+void matrix_transpose(const matrix_t * in, matrix_t * out) {
+
+	assert(in->d0 == out->d1);
+	assert(in->d1 == out->d0);
+
+	for (size_t i1 = 0; i1 < in->d1; i1++)
+	for (size_t i0 = 0; i0 < in->d0; i0++) {
+
+		MA(out, i1, i0) = MA(in, i0, i1);
+
+	}
+
+}
+
+void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
+
+}
+
+/**
+ *  from Matlab
+ *  [U,S,V] = svd(A,'econ');
+ *  s = diag(S);
+ *  if nargin < 2
+ *      tol = max(size(A)) * eps(norm(s,inf));
+ *  end
+ *  r1 = sum(s > tol)+1;
+ *  V(:,r1:end) = [];
+ *  U(:,r1:end) = [];
+ *  s(r1:end) = [];
+ *  s = 1./s(:);
+ *  X = bsxfun(@times,V,s.')*U';
+ */
+void matrix_pinv(const matrix_t * in, matrix_t * out) {
+
+	assert(in->d0 == out->d1);
+	assert(in->d1 == out->d0);
+
+	matrix_t
+		* U = matrix_create(in->d0, in->d1),
+		* V = matrix_create(in->d0, in->d0),
+		* S = matrix_create(in->d0, in->d0);
+
+	matrix_svd(in, U, S, V);
+
+	size_t r0 = 0;
+	for (size_t i0 = 0; i0 < S->d0; i0++) {
+
+		if (fabs(MA(S, i0, i0)) >= DBL_EPSILON) {
+
+			r0 += 1;
+			MA(S, i0, i0) = 1.0f / MA(S, i0, i0);
+
+		} else {
+
+			i0 = S->d0;
+
+		}
+
+	}
+
+	matrix_resize(S, r0, r0);
+	matrix_resize(U, r0, U->d1);
+	matrix_resize(V, r0, V->d1);
+
+	matrix_t
+		* UT = matrix_create(U->d1, U->d0),
+		* tmp = matrix_create(S->d0, S->d0);
+
+	matrix_multiply(V, S, tmp);
+	matrix_transpose(U, UT);
+	matrix_multiply(tmp, UT, out);
+
+	matrix_destroy(tmp);
+	matrix_destroy(S);
+	matrix_destroy(V);
+	matrix_destroy(U);
+	matrix_destroy(UT);
+
+}

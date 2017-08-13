@@ -59,24 +59,34 @@ void example_matrix_multiply() {
 void example_matrix_inverse(const char * filename) {
 
 	matrix_t * in = matrix_create_from_csv(filename);
-	matrix_t * tmp = matrix_create(in->d0, in->d1);
 	matrix_t * out = matrix_create(in->d0, in->d1);
 
 	fprintf_matrix(stdout, in, "example_matrix_inverse: in");
 
-	bool status = matrix_inverse(in, tmp, out);
+	bool status = matrix_inverse(in, out);
 	printf("status: %s\n", status == 0 ? "EXIT_SUCCESS" : "EXIT_FAILURE, i.e., has no inverse");
 
 	if (status == EXIT_SUCCESS) {
 
-		fprintf_matrix(stdout, tmp, "example_matrix_inverse: tmp");
 		fprintf_matrix(stdout, out, "example_matrix_inverse: out");
 
 	}
 
 	matrix_destroy(out);
-	matrix_destroy(tmp);
 	matrix_destroy(in);
+
+}
+
+void example_matrix_resize() {
+
+	matrix_t * left = matrix_create_from_csv("left.csv");
+
+	fprintf_matrix(stdout, left, "example_matrix_resize: origin");
+
+	matrix_resize(left, left->d0 - 1, left->d1 + 1);
+	fprintf_matrix(stdout, left, "example_matrix_resize: resized");
+
+	matrix_destroy(left);
 
 }
 
@@ -86,6 +96,7 @@ int main(int argc, char * argv[]) {
 	example_matrix_multiply();
 	example_matrix_inverse("inv1.csv");
 	example_matrix_inverse("inv2.csv");
+	example_matrix_resize();
 
 	return 0;
 
