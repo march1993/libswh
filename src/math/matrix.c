@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+#include <stdbool.h>
 #include <float.h>
 #include <string.h>
 
@@ -256,7 +257,89 @@ void matrix_transpose(const matrix_t * in, matrix_t * out) {
 
 }
 
+// http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
+// Algorithm 6: Biorthogonalization SVD
+double matrix_svd_eps = 1.0e-9;
 void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
+
+	// `S` and `V` should be square matrices
+	assert(S->d0 == S->d1);
+	assert(V->d0 == V->d1);
+
+	// `d0` of 'S' should be same to `d0` of `in`, `d0` of `V` also.
+	assert(S->d0 == in->d0);
+	assert(V->d0 == in->d0);
+
+	// `U` and `in` should be same sized.
+	assert(U->d0 == in->d0);
+	assert(U->d1 == in->d1);
+
+	const size_t n = in->d0, m = in->d1;
+
+	// 1. U <- A
+	matrix_duplicate(in, U);
+
+	// 2. V = I_nxn
+	matrix_clear(V);
+	for (size_t i0 = 0; i0 < V->d0; i0++) {
+
+		MA(V, i0, i0) = 0.0f;
+
+	}
+
+	// 3. Set N^2 = ||u_ij||^2, s = 0 and first = true
+	double N2 = 0.0f;
+	for (size_t i1 = 0; i1 < n; i1++)
+	for (size_t i0 = 0; i0 < n; i0++) {
+
+		N2 += MA(U, i0, i1) * MA(U, i0, i1);
+
+	}
+
+	double s = 0.0f;
+	bool first = true;
+
+	const double eps = matrix_svd_eps;
+
+	// 4. Repeat until sqrt(s) < N2 * eps * eps and first = false
+	while (sqrt(s) > N2 * eps * eps || first != false) {
+
+		// a. Set s = 0 and first = false
+		s = 0.0f;
+		first = false;
+
+		// For i = 1, ..., n - 1.
+		for (size_t i = 0; i < n - 1; i++)
+		// For j = i + 1, ..., n
+		for (size_t j = i + 1; j < n; j++) {
+
+			// s <- s + (u_ki * u_kj)^2
+			double sum = 0.0f;
+			for (size_t k = 0; k < m; k++) {
+
+				sum += MA(U, k, i) * MA(U, k, j);
+
+			}
+			s += sum * sum;
+
+			// Determin d1, d2, c = cos(θ), and s = sin(φ) such that
+			// [ c, -s; s, c ] * [||u_ki||, ||u_kiuKi||]
+
+			double tl = 0.0f, tr = 0.0f, bl = 0.0f, br = 0.0f;
+			for (size_t k = 0; k < m; k++) {
+
+				tl += MA(U, i, k) * MA(U, i, k);
+				tr += MA(U, i, k) * MA(U, j, k);
+				bl += MA(U, j, k) * MA(U, i, k);
+				br += MA(U, j, k) * MA(U, j, k);
+
+			}
+
+
+
+		}
+
+	}
 
 }
 
@@ -287,7 +370,7 @@ void matrix_pinv(const matrix_t * in, matrix_t * out) {
 	matrix_svd(in, U, S, V);
 
 	size_t r0 = 0;
-	for (size_t i0 = 0; i0 < S->d0; i0++) {
+	for (size_t i0 = 0; i0 < S->d0 && i0 < S->d1; i0++) {
 
 		if (fabs(MA(S, i0, i0)) >= DBL_EPSILON) {
 

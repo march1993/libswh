@@ -3,11 +3,13 @@
 PREFIX := /usr/local
 CC := cc
 
-CFLAGS := -O3 -Iinclude -std=c11 -DNDEBUG
-# DEBUG
-# CFLAGS := -Iinclude -std=c11
+# RELEASE
+# CFLAGS := -O3 -Iinclude -std=c11 -DNDEBUG
 
-LD_FLAGS :=
+# DEBUG
+CFLAGS := -Iinclude -std=c11
+
+LD_FLAGS := -lm
 
 .DEFAULT_GOAL:=all
 
@@ -31,7 +33,7 @@ install: lib
 	cp -r include/swh $(PREFIX)/include/
 
 $(EXAMPLE_OUT_FILES): example/%.out: example/%.c libswh.a
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(LD_FLAGS) $^ -o $@
 
 example: lib $(EXAMPLE_OUT_FILES)
 

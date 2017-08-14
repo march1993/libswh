@@ -102,7 +102,7 @@ struct matrix_tag {
    ```C
    void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V);
    ```
-   Singular value decomposition, i.e., in = U * S * V'. `in` and `U` should be same sized. `S` and `V` should be same sized and square. `d0` of `S` should be same to `d0` of `in`.
+   Singular value decomposition, i.e., in = U * S * V'. `S` and `V` should be smae sized and square matrices. `d0` of `V` should be same to `d0` of `in`. `U` and `in` should be same sized.
 
 * matrix_pinv
    ```C
