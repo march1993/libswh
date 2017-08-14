@@ -90,6 +90,15 @@ void example_matrix_resize() {
 
 }
 
+void example_matrix_svd_2x2() {
+
+	double sx, sy, phi, theta;
+	matrix_svd_2x2(1.0, 2.0, 3.0, 4.0, &sx, &sy, &phi, &theta);
+	printf("example_matrix_2x2_svd, svd of [ [1, 2], [3, 4] ] is:\n");
+	printf("sx: %lf, sy: %lf\nphi: %lf, theta: %lf\n", sx, sy, phi, theta);
+
+}
+
 int main(int argc, char * argv[]) {
 
 	example_read_write_matrix();
@@ -97,6 +106,7 @@ int main(int argc, char * argv[]) {
 	example_matrix_inverse("inv1.csv");
 	example_matrix_inverse("inv2.csv");
 	example_matrix_resize();
+	example_matrix_svd_2x2();
 
 	return 0;
 

@@ -98,6 +98,14 @@ struct matrix_tag {
    ```
    Transpose matrix `in` into `out`. `d0` of `in` should be `d1` of `out`, vice versa.
 
+* matrix_svd_2x2
+   ```C
+   void matrix_svd_2x2(const double m00, const double m01, const double m10, const double m11, double * sx, double * sy, double * phi, double * theta);
+   ```
+   Calculate the svd of matrix `M = [m00, m01; m10, m11]` into
+
+   `M = [cosϕ, -sinϕ; sinϕ, cosϕ] * [sx, 0; 0, sy] * [cosθ, sinθ; -sinθ, cosθ]`
+
 * matrix_svd
    ```C
    void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V);

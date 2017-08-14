@@ -50,5 +50,6 @@ extern void matrix_multiply(const matrix_t * left, const matrix_t * right, matri
 extern void matrix_multiply_k(const matrix_t * in, const double k, matrix_t * out);
 extern void matrix_transpose(const matrix_t * in, matrix_t * out);
 extern double matrix_svd_eps;
+extern void matrix_svd_2x2(const double m00, const double m01, const double m10, const double m11, double * sx, double * sy, double * phi, double * theta);
 extern void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V);
 extern void matrix_pinv(const matrix_t * in, matrix_t * out);

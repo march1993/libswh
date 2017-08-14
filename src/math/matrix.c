@@ -120,7 +120,7 @@ int matrix_inverse(const matrix_t * in, matrix_t * out) {
 
 	for (size_t i0 = 0; i0 < N; i0++) {
 
-		MA(out, i0, i0) = 1.0f;
+		MA(out, i0, i0) = 1.0;
 
 	}
 
@@ -175,7 +175,7 @@ int matrix_inverse(const matrix_t * in, matrix_t * out) {
 
 			// normalize
 			double e = MA(tmp, j, j);
-			MA(tmp, j, j) = 1.0f;
+			MA(tmp, j, j) = 1.0;
 
 			for (size_t l = 0; l < N; l++) {
 
@@ -257,6 +257,33 @@ void matrix_transpose(const matrix_t * in, matrix_t * out) {
 
 }
 
+// https://scicomp.stackexchange.com/questions/8899/robust-algorithm-for-2x2-svd
+// but slightly different, theta = (alpha1 - alpha2) / 2
+void matrix_svd_2x2(const double m00, const double m01, const double m10, const double m11, double * sx, double * sy, double * phi, double * theta) {
+
+	double
+		E = (m00 + m11) / 2.0,
+		F = (m00 - m11) / 2.0,
+		G = (m10 + m01) / 2.0,
+		H = (m10 - m01) / 2.0;
+
+	double
+		Q = sqrt(E * E + H * H),
+		R = sqrt(F * F + G * G);
+
+	* sx = Q + R;
+	* sy = Q - R;
+
+	double
+		alpha1 = atan2(G, F),
+		alpha2 = atan2(H, E);
+
+	* theta = (alpha1 - alpha2) / 2.0;
+	* phi = (alpha1 + alpha2) / 2.0;
+
+
+}
+
 // http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
 // Algorithm 6: Biorthogonalization SVD
 double matrix_svd_eps = 1.0e-9;
@@ -283,12 +310,12 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 	matrix_clear(V);
 	for (size_t i0 = 0; i0 < V->d0; i0++) {
 
-		MA(V, i0, i0) = 0.0f;
+		MA(V, i0, i0) = 0.0;
 
 	}
 
 	// 3. Set N^2 = ||u_ij||^2, s = 0 and first = true
-	double N2 = 0.0f;
+	double N2 = 0.0;
 	for (size_t i1 = 0; i1 < n; i1++)
 	for (size_t i0 = 0; i0 < n; i0++) {
 
@@ -296,7 +323,7 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 
 	}
 
-	double s = 0.0f;
+	double s = 0.0;
 	bool first = true;
 
 	const double eps = matrix_svd_eps;
@@ -305,7 +332,7 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 	while (sqrt(s) > N2 * eps * eps || first != false) {
 
 		// a. Set s = 0 and first = false
-		s = 0.0f;
+		s = 0.0;
 		first = false;
 
 		// For i = 1, ..., n - 1.
@@ -314,7 +341,7 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 		for (size_t j = i + 1; j < n; j++) {
 
 			// s <- s + (u_ki * u_kj)^2
-			double sum = 0.0f;
+			double sum = 0.0;
 			for (size_t k = 0; k < m; k++) {
 
 				sum += MA(U, k, i) * MA(U, k, j);
@@ -325,7 +352,7 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 			// Determin d1, d2, c = cos(θ), and s = sin(φ) such that
 			// [ c, -s; s, c ] * [||u_ki||, ||u_kiuKi||]
 
-			double tl = 0.0f, tr = 0.0f, bl = 0.0f, br = 0.0f;
+			double tl = 0.0, tr = 0.0, bl = 0.0, br = 0.0;
 			for (size_t k = 0; k < m; k++) {
 
 				tl += MA(U, i, k) * MA(U, i, k);
@@ -375,7 +402,7 @@ void matrix_pinv(const matrix_t * in, matrix_t * out) {
 		if (fabs(MA(S, i0, i0)) >= DBL_EPSILON) {
 
 			r0 += 1;
-			MA(S, i0, i0) = 1.0f / MA(S, i0, i0);
+			MA(S, i0, i0) = 1.0 / MA(S, i0, i0);
 
 		} else {
 
