@@ -26,7 +26,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <swh/math/matrix.h>
 
-
 matrix_t * matrix_create(size_t d0, size_t d1) {
 
 	matrix_t * ret = malloc(sizeof(matrix_t));
@@ -286,8 +285,10 @@ void matrix_svd_2x2(const double m00, const double m01, const double m10, const 
 
 // http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
 // Algorithm 6: Biorthogonalization SVD
-double matrix_svd_eps = 1.0e-9;
+double matrix_svd_eps = 1.0e-8;
 void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
+
+	const double eps = matrix_svd_eps;
 
 	// `S` and `V` should be square matrices
 	assert(S->d0 == S->d1);
@@ -310,7 +311,7 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 	matrix_clear(V);
 	for (size_t i0 = 0; i0 < V->d0; i0++) {
 
-		MA(V, i0, i0) = 0.0;
+		MA(V, i0, i0) = 1.0;
 
 	}
 
@@ -326,8 +327,6 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 	double s = 0.0;
 	bool first = true;
 
-	const double eps = matrix_svd_eps;
-
 	// 4. Repeat until sqrt(s) < N2 * eps * eps and first = false
 	while (sqrt(s) > N2 * eps * eps || first != false) {
 
@@ -336,7 +335,7 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 		first = false;
 
 		// For i = 1, ..., n - 1.
-		for (size_t i = 0; i < n - 1; i++)
+		for (size_t i = 0; i < n - 2; i++)
 		// For j = i + 1, ..., n
 		for (size_t j = i + 1; j < n; j++) {
 
@@ -344,13 +343,13 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 			double sum = 0.0;
 			for (size_t k = 0; k < m; k++) {
 
-				sum += MA(U, k, i) * MA(U, k, j);
+				sum += MA(U, i, k) * MA(U, j, k);
 
 			}
 			s += sum * sum;
 
 			// Determin d1, d2, c = cos(θ), and s = sin(φ) such that
-			// [ c, -s; s, c ] * [||u_ki||, ||u_kiuKi||]
+			// [ c, -s; s, c ] * [||u_ki||, ||u_ki*u_kj||; ||u_kj*u_ki||, ||u_kj||] * [ c, s; -s, c] = [ d_1, 0; 0; d_2 ].
 
 			double tl = 0.0, tr = 0.0, bl = 0.0, br = 0.0;
 			for (size_t k = 0; k < m; k++) {
@@ -362,7 +361,73 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 
 			}
 
+			double t = (tl - br) / tr / 2.0;
+			double x1 = t + sqrt(t * t + 1);
+			// x2 = t - sqrt(t * t + 1);
 
+			double theta = atan(x1);
+
+			double
+				c = cos(theta),
+				s = sin(theta);
+
+			if (isinf(t)) {
+
+				c = 0.0;
+				s = 1.0;
+
+			}
+
+			// U <- UR_i,j(c,s)
+			for (size_t i1 = 0; i1 < U->d1; i1++) {
+
+				double
+					x = MA(U, i, i1),
+					y = MA(U, j, i1);
+				MA(U, i, i1) = x * c - y * s;
+				MA(U, j, i1) = x * s + y * c;
+
+			}
+
+			// V <- VR_i,j(c,s)
+			for (size_t i1 = 0; i1 < V->d1; i1++) {
+
+				double
+					x = MA(V, i, i1),
+					y = MA(V, j, i1);
+				MA(V, i, i1) = x * c - y * s;
+				MA(V, j, i1) = x * s + y * c;
+
+			}
+
+		}
+
+	}
+
+	// 5. For i = 1, ..., n
+	matrix_clear(S);
+	for (size_t i = 0; i < n; i++) {
+
+		double sum = 0.0;
+		for (size_t k = 0; k < m; k++) {
+
+			sum += MA(U, i, k) * MA(U, i, k);
+
+		}
+
+		MA(S, i, i) = sqrt(sum);
+
+	}
+
+	for (size_t i0 = 0; i0 < S->d0; i0++) {
+
+		if (fabs(MA(S, i0, i0)) >= eps) {
+
+			for (size_t i1 = 0; i1 < U->d1; i1++) {
+
+				MA(U, i0, i1) = MA(U, i0, i1) / MA(S, i0, i0);
+
+			}
 
 		}
 

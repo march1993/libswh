@@ -14,7 +14,7 @@ void fprintf_matrix(FILE * stream, const matrix_t * matrix, const char * name) {
 
 		}
 
-		fprintf(stream, "%s", i1 == matrix->d1 - 1 ? " ] ]\n" : " ]\n");
+		fprintf(stream, "%s", i1 == matrix->d1 - 1 ? " ] ]\n\n" : " ]\n");
 	}
 
 }

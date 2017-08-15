@@ -112,8 +112,14 @@ struct matrix_tag {
    ```
    Singular value decomposition, i.e., in = U * S * V'. `S` and `V` should be smae sized and square matrices. `d0` of `V` should be same to `d0` of `in`. `U` and `in` should be same sized.
 
+   Reference: Algorithm 6 in http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
+
+   TODO: sort the singular values
+
 * matrix_pinv
    ```C
    void matrix_pinv(const matrix_t * in, matrix_t * out, double tol);
    ```
    Calculate the MoorePenrose pseudoinverse of matrix `in`. `d0` of `in` should be `d1` of `out`, vice versa.
+
+   TODO: still implementing. test required.
