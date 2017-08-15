@@ -92,6 +92,9 @@ void matrix_duplicate(const matrix_t * src, matrix_t * dest) {
 
 void matrix_exchange_rows(matrix_t * matrix, size_t r0, size_t r1) {
 
+	assert(r0 < matrix->d1);
+	assert(r1 < matrix->d1);
+
 	double tmp[matrix->d0];
 
 	size_t N = matrix->d0 * matrix->element_size;
@@ -99,6 +102,21 @@ void matrix_exchange_rows(matrix_t * matrix, size_t r0, size_t r1) {
 	memcpy(tmp, &MA(matrix, 0, r0), N);
 	memcpy(&MA(matrix, 0, r0), &MA(matrix, 0, r1), N);
 	memcpy(&MA(matrix, 0, r1), tmp, N);
+
+}
+
+void matrix_exchange_cols(matrix_t * matrix, size_t c0, size_t c1) {
+
+	assert(c0 < matrix->d0);
+	assert(c1 < matrix->d0);
+
+	for (size_t i1 = 0; i1 < matrix->d1; i1++) {
+
+		double tmp = MA(matrix, c0, i1);
+		MA(matrix, c0, i1) = MA(matrix, c1, i1);
+		MA(matrix, c1, i1) = tmp;
+
+	}
 
 }
 
@@ -428,6 +446,35 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 				MA(U, i0, i1) = MA(U, i0, i1) / MA(S, i0, i0);
 
 			}
+
+		}
+
+	}
+
+	// Additional: Sort, bubble sort
+	for (size_t i = 0; i < S->d0; i++) {
+
+		size_t gt = i;
+
+		for (size_t j = i + 1; j < S->d0; j++) {
+
+			if (MA(S, j, j) > MA(S, gt, gt)) {
+
+				gt = j;
+
+			}
+
+		}
+
+		if (i != gt) {
+
+			// switch two line
+			double tmp = MA(S, i, i);
+			MA(S, i, i) = MA(S, gt, gt);
+			MA(S, gt, gt) = tmp;
+
+			matrix_exchange_cols(V, i, gt);
+			matrix_exchange_cols(U, i, gt);
 
 		}
 

@@ -106,7 +106,10 @@ void example_matrix_svd() {
 	matrix_t
 		* U = matrix_create(in->d0, in->d1),
 		* S = matrix_create(in->d0, in->d0),
-		* V = matrix_create(in->d0, in->d0);
+		* V = matrix_create(in->d0, in->d0),
+		* t0 = matrix_create(in->d0, in->d0),
+		* t1 = matrix_create(in->d0, in->d0),
+		* t2 = matrix_create(in->d0, in->d1);
 
 	fprintf_matrix(stdout, in, "example_matrix_svd: in");
 
@@ -116,6 +119,15 @@ void example_matrix_svd() {
 	fprintf_matrix(stdout, S, "example_matrix_svd: S");
 	fprintf_matrix(stdout, V, "example_matrix_svd: V");
 
+	matrix_transpose(V, t0);
+	matrix_multiply(S, t0, t1);
+	matrix_multiply(U, t1, t2);
+
+	fprintf_matrix(stdout, t2, "example_matrix_svd: recovered matrix");
+
+	matrix_destroy(t0);
+	matrix_destroy(t1);
+	matrix_destroy(t2);
 	matrix_destroy(U);
 	matrix_destroy(S);
 	matrix_destroy(V);

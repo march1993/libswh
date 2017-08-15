@@ -114,7 +114,7 @@ struct matrix_tag {
 
    Reference: Algorithm 6 in http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
 
-   TODO: sort the singular values
+   TODO: error threshold.
 
 * matrix_pinv
    ```C
