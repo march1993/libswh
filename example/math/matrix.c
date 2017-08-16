@@ -99,17 +99,14 @@ void example_matrix_svd_2x2() {
 
 }
 
-void example_matrix_svd() {
+void example_matrix_svd(const char * filename) {
 
-	matrix_t * in = matrix_create_from_csv("pinv.csv");
+	matrix_t * in = matrix_create_from_csv(filename);
 
 	matrix_t
 		* U = matrix_create(in->d0, in->d1),
 		* S = matrix_create(in->d0, in->d0),
-		* V = matrix_create(in->d0, in->d0),
-		* t0 = matrix_create(in->d0, in->d0),
-		* t1 = matrix_create(in->d0, in->d0),
-		* t2 = matrix_create(in->d0, in->d1);
+		* V = matrix_create(in->d0, in->d0);
 
 	fprintf_matrix(stdout, in, "example_matrix_svd: in");
 
@@ -119,15 +116,34 @@ void example_matrix_svd() {
 	fprintf_matrix(stdout, S, "example_matrix_svd: S");
 	fprintf_matrix(stdout, V, "example_matrix_svd: V");
 
+	matrix_t
+		* t0 = matrix_create(V->d1, V->d0),
+		* t1 = matrix_create(t0->d0, S->d1),
+		* t2 = matrix_create(t1->d0, U->d1),
+		* t3 = matrix_create(V->d0, t0->d1),
+		* t4 = matrix_create(U->d1, U->d0),
+		* t5 = matrix_create(t4->d1, U->d0);
+
 	matrix_transpose(V, t0);
 	matrix_multiply(S, t0, t1);
 	matrix_multiply(U, t1, t2);
 
 	fprintf_matrix(stdout, t2, "example_matrix_svd: recovered matrix");
 
+	matrix_multiply(t0, V, t3);
+	fprintf_matrix(stdout, t3, "example_matrix_svd: V' * V");
+
+	matrix_transpose(U, t4);
+	matrix_multiply(t4, U, t5);
+	fprintf_matrix(stdout, t5, "example_matrix_svd: U' * U");
+
+
 	matrix_destroy(t0);
 	matrix_destroy(t1);
 	matrix_destroy(t2);
+	matrix_destroy(t3);
+	matrix_destroy(t4);
+	matrix_destroy(t5);
 	matrix_destroy(U);
 	matrix_destroy(S);
 	matrix_destroy(V);
@@ -135,15 +151,18 @@ void example_matrix_svd() {
 
 }
 
+#define EXAMPLE(X) printf("EXAMPLE <\033[32m%s\033[0m>\n", #X); X
+
 int main(int argc, char * argv[]) {
 
-	example_read_write_matrix();
-	example_matrix_multiply();
-	example_matrix_inverse("inv1.csv");
-	example_matrix_inverse("inv2.csv");
-	example_matrix_resize();
-	example_matrix_svd_2x2();
-	example_matrix_svd();
+	EXAMPLE(example_read_write_matrix());
+	EXAMPLE(example_matrix_multiply());
+	EXAMPLE(example_matrix_inverse("inv1.csv"));
+	EXAMPLE(example_matrix_inverse("inv2.csv"));
+	EXAMPLE(example_matrix_resize());
+	EXAMPLE(example_matrix_svd_2x2());
+	EXAMPLE(example_matrix_svd("pinv.csv"));
+	EXAMPLE(example_matrix_svd("svd2.csv"));
 
 	return 0;
 

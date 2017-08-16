@@ -110,11 +110,13 @@ struct matrix_tag {
    ```C
    void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V);
    ```
-   Singular value decomposition, i.e., in = U * S * V'. `S` and `V` should be smae sized and square matrices. `d0` of `V` should be same to `d0` of `in`. `U` and `in` should be same sized.
+   Singular value decomposition, i.e., in = U * S * V'. `S` and `V` should be same sized and square matrices. `d0` of `V` should be same to `d0` of `in`. `U` and `in` should be same sized.
+
+   Output: Suppose the rank of matrix `S` is `r`. `d0` and `d1` of `S`, `d0` of `U` and `d0` of `V` would be reduced to `r`.
 
    Reference: Algorithm 6 in http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
 
-   TODO: error threshold.
+   Default error toleration: `double matrix_svd_eps = 5.0e-9;`
 
 * matrix_pinv
    ```C

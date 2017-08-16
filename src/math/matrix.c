@@ -303,7 +303,7 @@ void matrix_svd_2x2(const double m00, const double m01, const double m10, const 
 
 // http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
 // Algorithm 6: Biorthogonalization SVD
-double matrix_svd_eps = 1.0e-8;
+double matrix_svd_eps = 5.0e-9;
 void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 
 	const double eps = matrix_svd_eps;
@@ -335,7 +335,7 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 
 	// 3. Set N^2 = ||u_ij||^2, s = 0 and first = true
 	double N2 = 0.0;
-	for (size_t i1 = 0; i1 < n; i1++)
+	for (size_t i1 = 0; i1 < m; i1++)
 	for (size_t i0 = 0; i0 < n; i0++) {
 
 		N2 += MA(U, i0, i1) * MA(U, i0, i1);
@@ -380,14 +380,20 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 			}
 
 			double t = (tl - br) / tr / 2.0;
-			double x1 = t + sqrt(t * t + 1);
+			double x1 = t + sqrt(t * t + 1.0);
 			// x2 = t - sqrt(t * t + 1);
 
+			/*
+			// worse precision
 			double theta = atan(x1);
 
 			double
 				c = cos(theta),
 				s = sin(theta);
+			*/
+			double
+				c = 1.0 / sqrt(1.0 + x1 * x1),
+				s = x1 / sqrt(1.0 + x1 * x1);
 
 			if (isinf(t)) {
 
@@ -451,6 +457,7 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 
 	}
 
+	size_t rank = 0;
 	// Additional: Sort, bubble sort
 	for (size_t i = 0; i < S->d0; i++) {
 
@@ -478,7 +485,18 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 
 		}
 
+		if (MA(S, i, i) >= MA(S, 0, 0) * eps) {
+
+			rank += 1;
+
+		}
+
 	}
+
+	matrix_resize(S, rank, rank);
+	matrix_resize(U, rank, U->d1);
+	matrix_resize(V, rank, V->d1);
+
 
 }
 
