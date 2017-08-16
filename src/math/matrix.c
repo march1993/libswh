@@ -303,7 +303,7 @@ void matrix_svd_2x2(const double m00, const double m01, const double m10, const 
 
 // http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
 // Algorithm 6: Biorthogonalization SVD
-double matrix_svd_eps = 5.0e-9;
+double matrix_svd_eps = 1.0e-8;
 void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 
 	const double eps = matrix_svd_eps;
@@ -353,7 +353,7 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 		first = false;
 
 		// For i = 1, ..., n - 1.
-		for (size_t i = 0; i < n - 2; i++)
+		for (size_t i = 0; i < n - 1; i++)
 		// For j = i + 1, ..., n
 		for (size_t j = i + 1; j < n; j++) {
 
@@ -395,10 +395,10 @@ void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V) {
 				c = 1.0 / sqrt(1.0 + x1 * x1),
 				s = x1 / sqrt(1.0 + x1 * x1);
 
-			if (isinf(t)) {
+			if (isnan(c)) {
 
-				c = 0.0;
-				s = 1.0;
+				c = 1.0;
+				s = 0.0;
 
 			}
 
@@ -526,29 +526,16 @@ void matrix_pinv(const matrix_t * in, matrix_t * out) {
 
 	matrix_svd(in, U, S, V);
 
-	size_t r0 = 0;
-	for (size_t i0 = 0; i0 < S->d0 && i0 < S->d1; i0++) {
+	for (size_t i0 = 0; i0 < S->d0; i0++) {
 
-		if (fabs(MA(S, i0, i0)) >= DBL_EPSILON) {
-
-			r0 += 1;
-			MA(S, i0, i0) = 1.0 / MA(S, i0, i0);
-
-		} else {
-
-			i0 = S->d0;
-
-		}
+		MA(S, i0, i0) = 1.0 / MA(S, i0, i0);
+		assert(!isinf(MA(S, i0, i0)));
 
 	}
 
-	matrix_resize(S, r0, r0);
-	matrix_resize(U, r0, U->d1);
-	matrix_resize(V, r0, V->d1);
-
 	matrix_t
 		* UT = matrix_create(U->d1, U->d0),
-		* tmp = matrix_create(S->d0, S->d0);
+		* tmp = matrix_create(S->d0, V->d1);
 
 	matrix_multiply(V, S, tmp);
 	matrix_transpose(U, UT);

@@ -116,7 +116,7 @@ struct matrix_tag {
 
    Reference: Algorithm 6 in http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
 
-   Default error toleration: `double matrix_svd_eps = 5.0e-9;`
+   Default error toleration: `double matrix_svd_eps = 1.0e-8;`
 
 * matrix_pinv
    ```C
@@ -124,4 +124,3 @@ struct matrix_tag {
    ```
    Calculate the MoorePenrose pseudoinverse of matrix `in`. `d0` of `in` should be `d1` of `out`, vice versa.
 
-   TODO: still implementing. test required.

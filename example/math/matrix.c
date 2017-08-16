@@ -151,6 +151,22 @@ void example_matrix_svd(const char * filename) {
 
 }
 
+void example_matrix_pinv(const char * filename) {
+
+	matrix_t
+		* in = matrix_create_from_csv(filename),
+		* out = matrix_create(in->d1, in->d0);
+
+	matrix_pinv(in, out);
+
+	fprintf_matrix(stdout, in, "example_matrix_pinv: in");
+	fprintf_matrix(stdout, out, "example_matrix_pinv: out");
+
+	matrix_destroy(in);
+	matrix_destroy(out);
+
+}
+
 #define EXAMPLE(X) printf("EXAMPLE <\033[32m%s\033[0m>\n", #X); X
 
 int main(int argc, char * argv[]) {
@@ -163,6 +179,10 @@ int main(int argc, char * argv[]) {
 	EXAMPLE(example_matrix_svd_2x2());
 	EXAMPLE(example_matrix_svd("pinv.csv"));
 	EXAMPLE(example_matrix_svd("svd2.csv"));
+	EXAMPLE(example_matrix_svd("inv2.csv"));
+	EXAMPLE(example_matrix_pinv("pinv.csv"));
+	EXAMPLE(example_matrix_pinv("svd2.csv"));
+	EXAMPLE(example_matrix_pinv("inv2.csv"));
 
 	return 0;
 
