@@ -22,16 +22,22 @@ matrix_t * matrix_create_from_csv(const char * filename) {
 
 	size_t cc = 0, cr = 0, cn = 0;
 	size_t cols = 0;
+	size_t n_non_empty = 0;
+	bool non_empty_line = false;
 	for (long i = 0; i < fsize; i++) {
 		switch(buf[i]) {
 			case ',': cc += 1; break;
-			case '\r': cr += 1; if (cols == 0) { cols = cc; } break;
-			case '\n': cn += 1; if (cols == 0) { cols = cc; } break;
-			default: break;
+			case '\r': cr += 1; if (cols == 0) { cols = cc; } if (non_empty_line) { n_non_empty += 1; } non_empty_line = false; break;
+			case '\n': cn += 1; if (cols == 0) { cols = cc; } if (non_empty_line) { n_non_empty += 1; } non_empty_line = false; break;
+			case ' ': break;
+			default: non_empty_line = true; break;
 		}
 	}
+	// in case of no '\r' or '\n' in last line
+	if (non_empty_line) { n_non_empty += 1; }
 
-	size_t rows = cc / cols;
+
+	size_t rows = cols > 0 ? (cc / cols) : n_non_empty;
 
 	if (rows * cols != cc) {
 
