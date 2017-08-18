@@ -44,6 +44,8 @@ extern double * matrix_at(const matrix_t * matrix, size_t i0, size_t i1);
 
 #define MA(matrix, i0, i1) (* matrix_at(matrix, i0, i1))
 
+extern void matrix_add(const matrix_t * left, const matrix_t * right, matrix_t * out);
+extern void matrix_sub(const matrix_t * left, const matrix_t * right, matrix_t * out);
 extern void matrix_duplicate(const matrix_t * src, matrix_t * dest);
 extern int matrix_inverse(const matrix_t * in, matrix_t * out);
 extern void matrix_multiply(const matrix_t * left, const matrix_t * right, matrix_t * out);

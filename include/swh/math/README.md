@@ -62,6 +62,18 @@ struct matrix_tag {
    ```
    `MA` defines a convenient macro to visit the element inside a matrix.
 
+* matrix_add
+   ```C
+   void matrix_add(const matrix_t * left, const matrix_t * right, matrix_t * out);
+   ```
+   Matrix addition
+
+* matrix_sub
+   ```C
+   void matrix_sub(const matrix_t * left, const matrix_t * right, matrix_t * out);
+   ```
+   Matrix subtraction
+
 * matrix_duplicate
    ```C
    void matrix_duplicate(const matrix_t * src, matrix_t * dest);

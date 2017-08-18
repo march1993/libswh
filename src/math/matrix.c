@@ -120,6 +120,40 @@ void matrix_exchange_cols(matrix_t * matrix, size_t c0, size_t c1) {
 
 }
 
+void matrix_add(const matrix_t * left, const matrix_t * right, matrix_t * out) {
+
+	assert(left->d0 == right->d0);
+	assert(right->d0 == out->d0);
+	assert(left->d1 == right->d1);
+	assert(right->d1 == out->d1);
+
+	for (size_t i1 = 0; i1 < left->d1; i1++)
+	for (size_t i0 = 0; i0 < left->d0; i0++) {
+
+		MA(out, i0, i1) = MA(left, i0, i1) + MA(right, i0, i1);
+
+	}
+
+
+}
+
+void matrix_sub(const matrix_t * left, const matrix_t * right, matrix_t * out) {
+
+	assert(left->d0 == right->d0);
+	assert(right->d0 == out->d0);
+	assert(left->d1 == right->d1);
+	assert(right->d1 == out->d1);
+
+	for (size_t i1 = 0; i1 < left->d1; i1++)
+	for (size_t i0 = 0; i0 < left->d0; i0++) {
+
+		MA(out, i0, i1) = MA(left, i0, i1) - MA(right, i0, i1);
+
+	}
+
+
+}
+
 /**
  *	Use the idea of (A|I) ~ (I|B) (with elementary row operations), then B = inv(A)
  */

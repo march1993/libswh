@@ -1,5 +1,6 @@
 # GNU make >= 3.81 required
 
+# Change the following to adapt your situation
 PREFIX := /usr/local
 CC := cc
 
@@ -7,7 +8,10 @@ CC := cc
 # CFLAGS := -O3 -Iinclude -std=c11 -DNDEBUG
 
 # DEBUG
-CFLAGS := -Iinclude -std=c11
+CFLAGS := -Iinclude -std=c11 -g
+
+
+# Following should be kept unchanged
 
 LD_FLAGS := -lm
 
