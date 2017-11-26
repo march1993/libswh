@@ -16,8 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SHA256_H
-#define SHA256_H
+#pragma once
 
 #include <stdlib.h>
 
@@ -35,5 +34,3 @@ extern void sha256(size_t n, const unsigned char input[n], unsigned char output[
 }
 #endif
 
-
-#endif // SHA256_H

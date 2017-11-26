@@ -1,3 +1,22 @@
+/**
+The functionality of this file is described in corresponding `README.md`.
+Copyright (C) 2017  https://github.com/march1993
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -20,6 +39,7 @@ static const uint32_t INITIAL_HASH[8] = {
 };
 
 static const uint32_t K[64] = {
+
 	0x428a2f98UL, 0x71374491UL, 0xb5c0fbcfUL, 0xe9b5dba5UL,
 	0x3956c25bUL, 0x59f111f1UL, 0x923f82a4UL, 0xab1c5ed5UL,
 	0xd807aa98UL, 0x12835b01UL, 0x243185beUL, 0x550c7dc3UL,
@@ -36,6 +56,7 @@ static const uint32_t K[64] = {
 	0x391c0cb3UL, 0x4ed8aa4aUL, 0x5b9cca4fUL, 0x682e6ff3UL,
 	0x748f82eeUL, 0x78a5636fUL, 0x84c87814UL, 0x8cc70208UL,
 	0x90befffaUL, 0xa4506cebUL, 0xbef9a3f7UL, 0xc67178f2UL,
+
 };
 
 static inline uint32_t R(const uint32_t x, const size_t n) {
@@ -88,99 +109,23 @@ static inline uint32_t Maj(const uint32_t x, const uint32_t y, const uint32_t z)
 
 
 // little, big endian conversion
-static void fill_block(const unsigned char in[64], uint32_t out[16]);
-static void fill_hash(const uint32_t in[8], unsigned char output[32]);
+static void fill_length(size_t n, unsigned char target[8]) {
 
-static void compression_function(const uint32_t block[16], const uint32_t previous[8], uint32_t output[8]);
-
-static void block_function(const unsigned char block[64], uint32_t result[8]);
-
-void sha256(size_t n, const unsigned char input[n], unsigned char output[32]) {
-
-	/**
-	 *	Step.1: padding
-	 */
-	// pad: 512 bits
-	unsigned char
-		pad_block0[64] = {0},
-		pad_block1[64] = {0};
-
-	size_t n_block = n / BLOCK_SIZE;
-	bool need_pad1 = (n % 64) > (64 - 8 - 1);
-
-	for (size_t i = n_block * BLOCK_SIZE; i < n; i++) {
-
-		size_t offset = i - n_block * BLOCK_SIZE;
-		pad_block0[offset] = input[i];
-
-	}
-
-	// pad 1
-	size_t offset = n - n_block * BLOCK_SIZE;
-	pad_block0[offset] = 0x80;
-
-
-	// pad message length
 	uint64_t l = n;
 	l = l * 8ULL; // in bits
-	unsigned char * target = (need_pad1 ? pad_block1 : pad_block0) + 64 - 8;
 
-	target[0] = l / 0x100000000000000ULL;
-	target[1] = l / 0x1000000000000ULL;
-	target[2] = l / 0x10000000000ULL;
-	target[3] = l / 0x100000000ULL;
-	target[4] = l / 0x1000000ULL;
-	target[5] = l / 0x10000ULL;
-	target[6] = l / 0x100ULL;
-	target[7] = l / 0x1ULL;
-
-	/**
-	 *	Step.2 iterating
-	 */
-
-	// initial hash
-	uint32_t result[8];
-	memcpy(result, INITIAL_HASH, sizeof(result));
-
-	for (size_t i = 0; i < n_block; i++) {
-
-		block_function(input + i * BLOCK_SIZE, result);
-
-	}
-
-	// pad_block0
-	block_function(pad_block0, result);
-
-	// pad_block1
-	if (need_pad1) {
-
-		block_function(pad_block1, result);
-
-	}
-
-	fill_hash(result, output);
+	target[7] = l % 0x100ULL; l = l >> 8;
+	target[6] = l % 0x100ULL; l = l >> 8;
+	target[5] = l % 0x100ULL; l = l >> 8;
+	target[4] = l % 0x100ULL; l = l >> 8;
+	target[3] = l % 0x100ULL; l = l >> 8;
+	target[2] = l % 0x100ULL; l = l >> 8;
+	target[1] = l % 0x100ULL; l = l >> 8;
+	target[0] = l % 0x100ULL; l = l >> 8;
 
 }
 
-
-void block_function(const unsigned char input[64], uint32_t result[8]) {
-
-	uint32_t cur_block[16];
-	uint32_t next_result[8];
-
-	fill_block(input, cur_block);
-	compression_function(cur_block, result, next_result);
-
-	for (size_t j = 0; j < 8; j++) {
-
-		result[j] += next_result[j];
-
-	}
-
-}
-
-
-void fill_block(const unsigned char in[64], uint32_t out[16]) {
+static void fill_block(const unsigned char in[64], uint32_t out[16]) {
 
 	for (size_t i = 0; i < 16; i++) {
 
@@ -190,29 +135,29 @@ void fill_block(const unsigned char in[64], uint32_t out[16]) {
 			n2 = in[i * 4 + 2],
 			n3 = in[i * 4 + 3];
 
-		out[i] = n0 * 0x1000000UL + n1 * 0x10000UL + n2 * 0x100UL + n3 * 0x1UL;
+		out[i] = (n0 << 24) + (n1 << 16) + (n2 << 8) + (n3 << 0);
 
 	}
 
 }
 
-void fill_hash(const uint32_t in[8], unsigned char output[32]) {
+static void fill_hash(const uint32_t in[8], unsigned char output[32]) {
 
 	for (size_t i = 0; i < 8; i++) {
 
-		output[i * 4 + 0] = in[i] / 0x1000000UL;
-		output[i * 4 + 1] = in[i] / 0x10000UL;
-		output[i * 4 + 2] = in[i] / 0x100UL;
-		output[i * 4 + 3] = in[i] / 0x1UL;
+		uint32_t w = in[i];
+
+		output[i * 4 + 3] = w % 0x100ULL; w = w >> 8;
+		output[i * 4 + 2] = w % 0x100ULL; w = w >> 8;
+		output[i * 4 + 1] = w % 0x100ULL; w = w >> 8;
+		output[i * 4 + 0] = w % 0x100ULL; w = w >> 8;
 
 	}
 
 
 }
 
-
-
-void compression_function(const uint32_t block[16], const uint32_t previous[8], uint32_t output[8]) {
+static void compression_function(const uint32_t block[16], const uint32_t previous[8], uint32_t output[8]) {
 
 	// prepare W[64]
 	uint32_t W[64];
@@ -257,5 +202,82 @@ void compression_function(const uint32_t block[16], const uint32_t previous[8], 
 		* a = T1 + T2;
 
 	}
+
+}
+
+static void block_function(const unsigned char input[64], uint32_t result[8]) {
+
+	uint32_t cur_block[16];
+	uint32_t next_result[8];
+
+	fill_block(input, cur_block);
+	compression_function(cur_block, result, next_result);
+
+	for (size_t j = 0; j < 8; j++) {
+
+		result[j] += next_result[j];
+
+	}
+
+}
+
+
+
+
+
+void sha256(size_t n, const unsigned char input[n], unsigned char output[32]) {
+
+	/**
+	 *	Step.1: padding
+	 */
+	// pad: 512 bits
+	unsigned char
+		pad_block0[64] = {0},
+		pad_block1[64] = {0};
+
+	size_t n_block = n / BLOCK_SIZE;
+	bool need_pad1 = (n % 64) > (64 - 8 - 1);
+
+	for (size_t i = n_block * BLOCK_SIZE; i < n; i++) {
+
+		size_t offset = i - n_block * BLOCK_SIZE;
+		pad_block0[offset] = input[i];
+
+	}
+
+	// pad 1
+	size_t offset = n - n_block * BLOCK_SIZE;
+	pad_block0[offset] = 0x80;
+
+
+	// pad message length
+	unsigned char * target = (need_pad1 ? pad_block1 : pad_block0) + 64 - 8;
+	fill_length(n, target);
+
+	/**
+	 *	Step.2 iterating
+	 */
+
+	// initial hash
+	uint32_t result[8];
+	memcpy(result, INITIAL_HASH, sizeof(result));
+
+	for (size_t i = 0; i < n_block; i++) {
+
+		block_function(input + i * BLOCK_SIZE, result);
+
+	}
+
+	// pad_block0
+	block_function(pad_block0, result);
+
+	// pad_block1
+	if (need_pad1) {
+
+		block_function(pad_block1, result);
+
+	}
+
+	fill_hash(result, output);
 
 }

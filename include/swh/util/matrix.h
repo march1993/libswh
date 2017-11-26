@@ -21,4 +21,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <swh/math/matrix.h>
 #include <stdio.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 extern void fprintf_matrix(FILE * stream, const matrix_t * matrix, const char * name);
+
+
+#ifdef __cplusplus
+}
+#endif
+

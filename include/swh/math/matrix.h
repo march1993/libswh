@@ -21,6 +21,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 typedef struct matrix_tag matrix_t;
 struct matrix_tag {
 
@@ -55,3 +60,9 @@ extern double matrix_svd_eps;
 extern void matrix_svd_2x2(const double m00, const double m01, const double m10, const double m11, double * sx, double * sy, double * phi, double * theta);
 extern void matrix_svd(const matrix_t * in, matrix_t * U, matrix_t * S, matrix_t * V);
 extern void matrix_pinv(const matrix_t * in, matrix_t * out);
+
+
+#ifdef __cplusplus
+}
+#endif
+

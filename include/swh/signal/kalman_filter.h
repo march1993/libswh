@@ -19,6 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <swh/math/matrix.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 typedef struct {
 
 	matrix_t
@@ -84,3 +90,9 @@ extern void kalman_filter_set_initial(kalman_filter_t * filter, matrix_t * xs, m
 extern void kalman_filter_destroy(kalman_filter_t * filter);
 
 extern const double * kalman_filter_observe(kalman_filter_t * filter, const double y[filter->model.ny]);
+
+
+#ifdef __cplusplus
+}
+#endif
+
